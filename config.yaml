@@ -1,0 +1,17 @@
+cookie:
+  expiry_days: 30
+  key: efar-scoring
+  name: scoring
+credentials:
+  usernames:
+    faran.samake:
+      email: faran.samake@efartech.com
+      name: Faran SAMAKE
+      password: $2b$12$iwS2DSFw9XkK.KoAqpRaLuh/e5IgwemFyBqrPX/x12mJTpdhDcany
+    guest:
+      email: guest@efartech.com
+      name: Guest GUEST
+      password: $2b$12$/908D/h9AMHLw7wz0Nnyh.hkkMF72zutedWUpCAdMvCq/EcNV2RHS
+preauthorized:
+  emails:
+  - faran.samake@efartech.com

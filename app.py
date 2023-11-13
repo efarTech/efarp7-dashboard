@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 
 import streamlit as st
 import requests
-import joblib
 import login, home, client, analyze
 import streamlit_authenticator as authenticator
 import logging

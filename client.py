@@ -142,8 +142,8 @@ def client(df_application):
     st.header('SCORING', divider='rainbow')
     st.subheader('_Modèle de scoring_ :blue[_Classification_] :sunglasses:')
 
-    base_url = 'http://127.0.0.1:5001/' 
-    #base_url = 'https://efarp7-api-cdf24a708427.herokuapp.com/'
+    #base_url = 'http://127.0.0.1:5001/' 
+    base_url = 'https://efar7-api-8b6b495cd473.herokuapp.com/'
     request_url = f'{base_url}customers/'
     response = requests.get(request_url)
 

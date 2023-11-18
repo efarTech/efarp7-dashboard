@@ -24,6 +24,7 @@ def client(df_application):
                 print(f'\033[1m>>>\033[0m [{datetime.now()}][\033[1mCLIENT\033[0m] Le service API de scoring est introuvable {response}')
         
         score = predicted_proba * 100
+        decidion = f'{"Prêt accepté".upper() if score > 60 else "Prêt refusé".upper()}'
         
         predicted_gauge = go.Figure(
             go.Indicator( 
@@ -56,86 +57,91 @@ def client(df_application):
                     }
                 },
                 title = {
-                    'text': f'{"Prêt accepté".upper() if score > 60 else "Prêt refusé".upper()}'
+                    'text': decidion
                 }
             )
         )
-        return predicted_gauge
+        return predicted_gauge, decidion
 
-    def on_selectedchanged(selected):
+    def on_selectedchanged(df_application, customers_references, base_url, selected):
         st.session_state['customer_reference'] = selected
         left_, center_, last_ = st.columns([0.23, 0.38, 0.38])
 
         with center_:
-            fig = update(customers_references, selected, base_url)
+            fig, decidion = update(customers_references, selected, base_url)
             st.plotly_chart(fig)
 
-        sex = df_application.loc[int(selected), 'CODE_GENDER']
-        age = int(np.trunc(-int(df_application.loc[int(selected), 'DAYS_BIRTH']) / 365))
-        family_status = df_application.loc[int(selected), 'NAME_FAMILY_STATUS']
-        education_level = df_application.loc[int(selected), 'NAME_EDUCATION_TYPE']
-        occupation_type = df_application.loc[int(selected), 'OCCUPATION_TYPE']
-        own_realty = df_application.loc[int(selected), 'FLAG_OWN_REALTY']
-        amount_income = str(df_application.loc[int(selected), 'AMT_INCOME_TOTAL'])
-        contract_type = str(df_application.loc[int(selected), 'NAME_CONTRACT_TYPE'])
-        amount_credit = str(df_application.loc[int(selected), 'AMT_CREDIT'])
-        amount_annuity = df_application.loc[int(selected), 'AMT_ANNUITY'] / 12
-
-        column1, column2, column3 = st.columns(3)
+        column1, column2, column3, column4 = st.columns(4)
 
         with column1:
-            st.header('Client')
+            st.header('CLIENT')
             st.write(
                 '_Sex_ : ',
-                f'***{sex}***'
+                f'***{df_application.loc[int(selected), "CODE_GENDER"]}***'
             )
             st.write(
                 '_Age_ : ', 
-                f'***{age}***'
+                f'***{":green[" if "Prêt accepté".upper() == decidion else ":red[" }{int(np.trunc(-int(df_application.loc[int(selected), "DAYS_BIRTH"]) / 365))}]***'
             )
             st.write(
                 '_Statut familial_ : ', 
-                f'***{family_status}***'
+                f'***{df_application.loc[int(selected), "NAME_FAMILY_STATUS"]}***'
             )
             st.write(
                 '_Type de formation_ : ', 
-                f'***{education_level}***'
+                f'***{df_application.loc[int(selected), "NAME_EDUCATION_TYPE"]}***'
             )
             st.write(
                 '_Type de profession_ : ', 
-                f'***{occupation_type}***'
+                f'***{df_application.loc[int(selected), "OCCUPATION_TYPE"]}***'
             )
             st.write(
                 '_Client propriétaire_ : ', 
-                f'***{own_realty}***'
+                f'***{df_application.loc[int(selected), "FLAG_OWN_REALTY"]}***'
             )
             st.write(
                 '_Revenu du client_ : ', 
-                f'***{amount_income}***'
+                f'***{":green[" if "Prêt accepté".upper() == decidion else ":red[" }{str(df_application.loc[int(selected), "AMT_INCOME_TOTAL"])}]***'
             )
 
         with column2:
-            st.header('Contract')
+            st.header('CONTRAT')
             st.write(
                 '_Type de contrat_ : ', 
-                f'***{contract_type}***'
+                f'***{str(df_application.loc[int(selected), "NAME_CONTRACT_TYPE"])}***'
             )
             st.write(
                 '_Montant du crédit_ : ', 
-                f'***{amount_credit}***'
+                f'***{":green[" if "Prêt accepté".upper() == decidion else ":red[" }{str(df_application.loc[int(selected), "AMT_CREDIT"])}]***'
             )
             st.write(
                 '_Mensualité du prêt_ : ',
-                f'***{amount_annuity:.1f}***'
+                f'***{":green[" if "Prêt accepté".upper() == decidion else ":red[" }{df_application.loc[int(selected), "AMT_ANNUITY"] / 12:.1f}]***'
             )
 
         with column3:
-            st.header('À Propos')
+            st.header('MOYENNE')
+            st.dataframe(
+                df_application[['DAYS_BIRTH', 'AMT_INCOME_TOTAL', 'AMT_CREDIT', 'AMT_ANNUITY']].assign(
+                    DAYS_BIRTH=np.trunc(-df_application.DAYS_BIRTH / 365),
+                    AMT_ANNUITY=df_application['AMT_ANNUITY'] / 12
+                ).rename(
+                    columns={
+                        'DAYS_BIRTH': 'Age du client', 
+                        'AMT_INCOME_TOTAL': 'Revenu du client',
+                        'AMT_CREDIT': 'Montant du crédit',
+                        'AMT_ANNUITY': 'Mensualité du prêt',
+                    }
+                ).mean().to_frame(name='Les moyennes')
+            )
+        
+        with column4:   
+            st.header('INFORMATION')
             st.write(
                 """
-                1. _Le prêt à dépenser est refusé pour un ***score*** inférieur à ***60***_
-                2. _Le prêt à dépenser est accépté pour un ***score*** supérieur à ***60***_
-                3. _Pour plus d'information, consulter la partie ***Analyse***_ 
+                1. _Prêt à dépenser est refusé: :red[***Score*** < ***60***]_
+                2. _Prêt à dépenser est accépté: :green[***Score*** > ***60***]_
+                3. _Décision: voir la partie ***Analyse***_ 
                 """
             )
 
@@ -159,9 +165,8 @@ def client(df_application):
         selected = st.selectbox(
             'Selectionner un client', 
             customers_references,
-            #index=0 if 'customer_reference' not in st.session_state else customers_references.index(st.session_state.customer_reference),
             placeholder='Selectionner la reference du client...'
         )
-        on_selectedchanged(selected)
+        on_selectedchanged(df_application, customers_references, base_url, selected)
         
         

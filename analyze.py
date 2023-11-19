@@ -1,9 +1,3 @@
-from datetime import datetime
-
-import pandas as pd
-import numpy as np
-
-import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 
 import streamlit as st
@@ -29,16 +23,10 @@ def analyze(
         customer_index = customer_index.index.values[0]
         
         if isinstance(shap_explaine_expected_value, list):
-            if len(shap_explaine_expected_value) > 1:
-                shap_explaine_expected_value = shap_explaine_expected_value[1]
-            else:
-                shap_explaine_expected_value = shap_explaine_expected_value[0]
+            shap_explaine_expected_value = shap_explaine_expected_value[1] if len(shap_explaine_expected_value) > 1 else shap_explaine_expected_value[0]
 
         if isinstance(shap_waterfall_expected_value, list):
-            if len(shap_waterfall_expected_value) > 1:
-                shap_waterfall_expected_value = shap_waterfall_expected_value[1]
-            else:
-                shap_waterfall_expected_value = shap_waterfall_expected_value[0]
+            shap_waterfall_expected_value = shap_waterfall_expected_value[1] if len(shap_waterfall_expected_value) > 1 else shap_waterfall_expected_value[0]
         
         fig_waterfall_plot = shap.plots._waterfall.waterfall_legacy(
             shap_waterfall_expected_value, 
@@ -64,7 +52,6 @@ def analyze(
         st.write(
             f"""
             **Réference du client**
-            
                 {customer_reference}
             """
         )

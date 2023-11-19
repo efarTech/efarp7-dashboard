@@ -1,7 +1,4 @@
-from datetime import datetime
-
 import streamlit as st
-import base64
 import yaml
 import streamlit_authenticator as authenticator
 

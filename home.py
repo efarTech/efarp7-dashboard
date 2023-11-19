@@ -5,7 +5,7 @@ def home():
     st.subheader('_Crédits à la consommation_ :blue[_Scoring crédit_] :sunglasses:')
     st.empty()
     
-    left_column, center_column, last_column = st.columns(3)
+    _, center_column, _ = st.columns(3)
     center_column.image('./repositories/data/pretadepenser.png', width=300)
     
     st.write(

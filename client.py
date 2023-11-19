@@ -1,15 +1,11 @@
 from datetime import datetime
 
-import pandas as pd
 import numpy as np
 
 import plotly.graph_objects as go
-import matplotlib.pyplot as plt
 
 import streamlit as st
 import requests
-
-from modules.file.EfarDataFile import EfarDataFile
 
 def client(df_application):
     def update(customers_references, customer_reference, base_url):

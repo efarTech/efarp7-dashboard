@@ -2,6 +2,7 @@ import streamlit as st
 import login, home, client, analyze
 import logging
 
+from repositories.EfarRepository import EfarRepository
 from controllers.EfarScoringController import EfarScoringController
 from controllers.EfarLoginController import EfarLoginController
 from controllers.EfarShapController import EfarShapController
@@ -42,9 +43,10 @@ def main(
 st.set_option('deprecation.showPyplotGlobalUse', False)
 st.set_page_config(layout="wide", page_title='dashboard')
 
-scoringController = EfarScoringController('./repositories/data/')
-loginController = EfarLoginController('./repositories/data/')
-shapController = EfarShapController('./repositories/data/')
+repository = EfarRepository('./repositories/data/')
+scoringController = EfarScoringController(repository)
+loginController = EfarLoginController(repository)
+shapController = EfarShapController(repository)
 
 authenticate, login_header_placeholder, login_subheader_placeholder = login.run('./config.yaml')
 

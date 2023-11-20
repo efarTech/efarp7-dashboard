@@ -9,25 +9,25 @@ from datetime import datetime, date
 import pandas as pd
 import numpy as np
 
+import joblib
 import warnings
+import dill
 import logging
 
 from flask import Flask, jsonify
-from repositories.EfarRepository import EfarRepository
 
 class EfarShapController:
     """
     Efardb class
     """
-    def __init__(self, directory):
+    def __init__(self, repository):
         """
         __init__ method
         """
-        self.repository = EfarRepository(directory)
-        self.shap_explaine_expected_value = self.repository.get_shap_explaine_expected_value_data()
-        self.shap_values = self.repository.get_shap_values_data()
-        self.shap_waterfall_expected_value = self.repository.get_shap_waterfall_expected_value_data()
-        self.shap_values_waterfall = self.repository.get_shap_values_waterfall_data()
+        self.shap_explaine_expected_value = repository.get_shap_explaine_expected_value_data()
+        self.shap_values = repository.get_shap_values_data()
+        self.shap_waterfall_expected_value = repository.get_shap_waterfall_expected_value_data()
+        self.shap_values_waterfall = repository.get_shap_values_waterfall_data()
     
     def get_shap_explaine_expected_value(self):
         """
